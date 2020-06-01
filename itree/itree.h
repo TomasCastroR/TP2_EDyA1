@@ -29,8 +29,20 @@ void itree_recorrer_dfs (ITree arbol);
 
 void itree_recorrer_bfs (ITree arbol);
 
-int itree_altura (ITree arbol, int alturaActual, int *alturaMax);
+int itree_altura (ITree arbol);
 
 int itree_balance_altura (ITree arbol);
+
+ITree itree_rotar_derecha (ITree arbol);
+
+ITree itree_rotar_izquierda (ITree arbol);
+
+ITree itree_rotar_der_izq (ITree arbol);
+
+ITree itree_rotar_izq_der (ITree arbol);
+
+ITree itree_max_extremo_der (ITree arbol);
+
+double mayor (double a, double b);
 
 #endif

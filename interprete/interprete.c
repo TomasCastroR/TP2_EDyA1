@@ -9,6 +9,6 @@ int main () {
   double intervaloIzq, intervaloDer;
   int CONDICION = 1;
   printf ("ingrese un comando: ");
-  scanf ("%[^]", resto);
-  printf ("%s\n", resto);
+  scanf ("%[^\n]", resto);
+  printf ("%c\n", resto[1]);
 }
