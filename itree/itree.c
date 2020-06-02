@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+Intervalo* intervalo_crear (double extIzq, double extDer) {
+  Intervalo *newIntervalo = malloc (sizeof(Intervalo));
+  newIntervalo->extrIzq = extIzq;
+  newIntervalo->extrDer = extDer;
+  return newIntervalo;
+}
+
+int intervalo_igualdad (Intervalo *inter1, Intervalo *inter2) {
+  return inter1->extrIzq == inter2->extrIzq && inter1->extrDer == inter2->extrDer;
+}
+
 ITree itree_crear() {
   return NULL;
 }
@@ -10,7 +22,8 @@ void itree_destruir (ITree arbol) {
   if (arbol != NULL) {
     itree_destruir(arbol->izq);
     itree_destruir(arbol->der);
-    free(arbol);
+    free (arbol->intervalo);
+    free (arbol);
   }
 }
 
@@ -64,22 +77,16 @@ ITree itree_chequeo_balancear (ITree arbol) {
   int balanceAltura = itree_balance_altura (arbol);
   if (balanceAltura > 1) {
     int balanceAlturaIzq = itree_balance_altura(arbol->izq);
-    if (balanceAlturaIzq > 1)
+    if (balanceAlturaIzq == 1)
       arbol = itree_rotar_derecha(arbol);
-    else {
-      if (balanceAlturaIzq < -1)
-        arbol = itree_rotar_izq_der (arbol);
-    }
+    else arbol = itree_rotar_izq_der (arbol);
   }
   else {
     if (balanceAltura < -1) {
       int balanceAlturaDer = itree_balance_altura(arbol->der);
-      if (balanceAlturaDer > 1)
+      if (balanceAlturaDer == 1)
         arbol = itree_rotar_derecha(arbol);
-      else {
-        if (balanceAlturaDer < -1)
-          arbol = itree_rotar_der_izq (arbol);
-      }
+      else arbol = itree_rotar_der_izq (arbol);
     }
   }
   return arbol;
@@ -105,45 +112,61 @@ ITree itree_max_extremo_der (ITree arbol) {
       arbol->maxExtremoDer = maximoExtDer;
     }
     else {
-      maximoExtDer = mayor (arbol->izq->maxExtremoDer, arbol->maxExtremoDer);
-      arbol->maxExtremoDer = maximoExtDer;
+      if (arbol->izq != NULL) {
+        maximoExtDer = mayor (arbol->izq->maxExtremoDer, arbol->maxExtremoDer);
+        arbol->maxExtremoDer = maximoExtDer;
+      }
     }
   }
   return arbol;
 }
 
-ITree itree_insertar (ITree arbol, double extIzq, double extDer) {
+ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
   if (arbol == NULL) {
     arbol = malloc (sizeof(INodo));
-    arbol->extremoIzq = extIzq;
-    arbol->extremoDer = extDer;
-    arbol->maxExtremoDer = extDer;
+    arbol->intervalo = intervalo;
+    arbol->maxExtremoDer = intervalo->extrDer;
     arbol->der = NULL;
     arbol->izq = NULL;
   }
   else {
-    if (arbol->extremoIzq < extIzq)
-      arbol->der = itree_insertar (arbol->der, extIzq, extDer);
+    if (arbol->intervalo->extrIzq < intervalo->extrIzq)
+      arbol->der = itree_insertar (arbol->der,intervalo);
     else 
-      arbol->izq = itree_insertar (arbol->izq, extIzq, extDer);
+      arbol->izq = itree_insertar (arbol->izq, intervalo);
   }
-  // balancear el arbol
   arbol = itree_chequeo_balancear (arbol);
-  // modificar maximo derecho
   arbol = itree_max_extremo_der (arbol);
   return arbol;
 }
 
-void itree_eliminar (ITree arbol, double extIzq, double extDer);
+void itree_eliminar (ITree arbol, Intervalo *intervalo);
 
-INodo* itree_intersecar (ITree arbol, double extIzq, double extDer);
-
-void itree_recorrer_dfs (ITree arbol) {
+int itree_contiene (ITree arbol, Intervalo *intervalo) {
   if (arbol == NULL)
-    return;
-  itree_recorrer_dfs (arbol->izq);
-  printf ("[%lf, %lf] ", arbol->extremoIzq, arbol->extremoDer);
-  itree_recorrer_dfs (arbol->der);
+    return 0;
+  if (intervalo_igualdad (arbol->intervalo, intervalo))
+    return 1;
+  else {
+    if (arbol->intervalo->extrIzq < intervalo->extrIzq)
+      return itree_contiene (arbol->der, intervalo);
+    else return itree_contiene (arbol->izq, intervalo);
+  }
 }
 
-void itree_recorrer_bfs (ITree arbol);
+INodo* itree_intersecar (ITree arbol, Intervalo *intervalo);
+
+void imprimir_intervalo (void* dato) {
+  Intervalo *intervalo = dato;
+  printf ("[%lf, %lf] ", intervalo->extrIzq, intervalo->extrDer);
+}
+
+void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {
+  if (arbol == NULL)
+    return;
+  itree_recorrer_dfs (arbol->izq, funcion);
+  funcion (arbol->intervalo);
+  itree_recorrer_dfs (arbol->der, funcion);
+}
+
+void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion);
