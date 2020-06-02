@@ -1,7 +1,7 @@
 #ifndef __ITREE_H__
 #define __ITREE_H__
 
-typedef void (*FuncionVisitante) (void* dato);
+typedef void (*FuncionVisitante) (Intervalo* dato);
 
 typedef struct {
   double extrIzq;
@@ -20,6 +20,8 @@ typedef INodo* ITree;
 Intervalo* intervalo_crear (double extIzq, double extDer);
 
 int intervalo_igualdad (Intervalo *inter1, Intervalo *inter2);
+
+int intervalo_no_intersecar (Intervalo *inter1, Intervalo *inter2);
 
 ITree itree_crear();
 
@@ -53,7 +55,7 @@ ITree itree_rotar_izq_der (ITree arbol);
 
 ITree itree_max_extremo_der (ITree arbol);
 
-void imprimir_intervalo (void* dato);
+void imprimir_intervalo (Intervalo* dato);
 
 double mayor (double a, double b);
 

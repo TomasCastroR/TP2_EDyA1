@@ -14,6 +14,10 @@ int intervalo_igualdad (Intervalo *inter1, Intervalo *inter2) {
   return inter1->extrIzq == inter2->extrIzq && inter1->extrDer == inter2->extrDer;
 }
 
+int intervalo_no_intersecar (Intervalo *inter1, Intervalo *inter2) {
+  return inter2->extrDer < inter1->extrIzq || inter1->extrDer < inter2->extrIzq;
+}
+
 ITree itree_crear() {
   return NULL;
 }
@@ -76,16 +80,16 @@ ITree itree_rotar_der_izq (ITree arbol) {
 ITree itree_chequeo_balancear (ITree arbol) {
   int balanceAltura = itree_balance_altura (arbol);
   if (balanceAltura > 1) {
-    int balanceAlturaIzq = itree_balance_altura(arbol->izq);
+    int balanceAlturaIzq = itree_balance_altura (arbol->izq);
     if (balanceAlturaIzq == 1)
-      arbol = itree_rotar_derecha(arbol);
+      arbol = itree_rotar_derecha (arbol);
     else arbol = itree_rotar_izq_der (arbol);
   }
   else {
     if (balanceAltura < -1) {
-      int balanceAlturaDer = itree_balance_altura(arbol->der);
-      if (balanceAlturaDer == 1)
-        arbol = itree_rotar_derecha(arbol);
+      int balanceAlturaDer = itree_balance_altura (arbol->der);
+      if (balanceAlturaDer == -1)
+        arbol = itree_rotar_izquierda (arbol);
       else arbol = itree_rotar_der_izq (arbol);
     }
   }
@@ -100,19 +104,21 @@ double mayor (double a, double b) {
 }
 
 ITree itree_max_extremo_der (ITree arbol) {
-  int maximoExtDer;
-  if (arbol->der != NULL && arbol->izq != NULL) {
-    maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->izq->maxExtremoDer);
-    maximoExtDer = mayor (maximoExtDer, arbol->maxExtremoDer);
-    arbol->maxExtremoDer = maximoExtDer;
-  }
+  double maximoExtDer;
+  if (arbol->der == NULL && arbol->izq == NULL)
+    arbol->maxExtremoDer = arbol->intervalo->extrDer;
   else {
-    if (arbol->der != NULL) {
-      maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->maxExtremoDer);
+    if (arbol->der != NULL && arbol->izq != NULL) {
+      maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->izq->maxExtremoDer);
+      maximoExtDer = mayor (maximoExtDer, arbol->maxExtremoDer);
       arbol->maxExtremoDer = maximoExtDer;
     }
     else {
-      if (arbol->izq != NULL) {
+      if (arbol->der != NULL) {
+        maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->maxExtremoDer);
+        arbol->maxExtremoDer = maximoExtDer;
+      }
+      else {
         maximoExtDer = mayor (arbol->izq->maxExtremoDer, arbol->maxExtremoDer);
         arbol->maxExtremoDer = maximoExtDer;
       }
@@ -154,11 +160,25 @@ int itree_contiene (ITree arbol, Intervalo *intervalo) {
   }
 }
 
-INodo* itree_intersecar (ITree arbol, Intervalo *intervalo);
+INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
+  if (arbol == NULL || arbol->maxExtremoDer < intervalo->extrIzq)
+    return NULL;
+  if (!intervalo_no_intersecar (arbol->intervalo, intervalo))
+    return arbol;
+  if (intervalo->extrIzq <= arbol->maxExtremoDer && arbol->maxExtremoDer <= intervalo->extrDer) {
+    if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
+      return itree_intersecar (arbol->izq, intervalo);
+    else return itree_intersecar (arbol->der, intervalo);
+  }
+  if (arbol->intervalo->extrIzq > intervalo->extrDer )
+    return itree_intersecar (arbol->izq, intervalo);
+  if (arbol->izq->maxExtremoDer >= intervalo->extrIzq)
+    return itree_intersecar (arbol->izq, intervalo);
+  else return itree_intersecar (arbol->der, intervalo);
+}
 
-void imprimir_intervalo (void* dato) {
-  Intervalo *intervalo = dato;
-  printf ("[%lf, %lf] ", intervalo->extrIzq, intervalo->extrDer);
+void imprimir_intervalo (Intervalo* dato) {
+  printf ("[%lf, %lf] ", dato->extrIzq, dato->extrDer);
 }
 
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {
