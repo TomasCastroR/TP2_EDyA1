@@ -186,20 +186,15 @@ int itree_contiene (ITree arbol, Intervalo *intervalo) {
 }
 
 INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
-  if (arbol == NULL || arbol->maxExtremoDer < intervalo->extrIzq)
+  if (arbol == NULL || arbol->maxExtremoDer < intervalo->extrIzq)//tendriamos q ver de q lo pregunte 1 sola vez a esto, por ende tendria q ser fuera de la funcion-
     return NULL;
   if (!intervalo_no_intersecar (arbol->intervalo, intervalo))
     return arbol;
-  if (intervalo->extrIzq <= arbol->maxExtremoDer && arbol->maxExtremoDer <= intervalo->extrDer) {
-    if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
+  if (arbol->intervalo->extrIzq > intervalo->extrDer )
+    return itree_intersecar(arbol->izq,intervalo);
+  if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
       return itree_intersecar (arbol->izq, intervalo);
     else return itree_intersecar (arbol->der, intervalo);
-  }
-  if (arbol->intervalo->extrIzq > intervalo->extrDer)
-    return itree_intersecar (arbol->izq, intervalo);
-  if (arbol->izq->maxExtremoDer >= intervalo->extrIzq)
-    return itree_intersecar (arbol->izq, intervalo);
-  else return itree_intersecar (arbol->der, intervalo);
 }
 
 void imprimir_intervalo (void* dato) {
