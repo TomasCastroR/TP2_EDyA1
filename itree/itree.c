@@ -2,24 +2,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define COUNT 10
 
-Intervalo* intervalo_crear (double extIzq, double extDer) {
-  Intervalo *newIntervalo = malloc (sizeof(Intervalo));
-  newIntervalo->extrIzq = extIzq;
-  newIntervalo->extrDer = extDer;
-  return newIntervalo;
-}
 
-int intervalo_igualdad (Intervalo *inter1, Intervalo *inter2) {
-  return inter1->extrIzq == inter2->extrIzq && inter1->extrDer == inter2->extrDer;
-}
-
-int intervalo_no_intersecar (Intervalo *inter1, Intervalo *inter2) {
-  return inter2->extrDer < inter1->extrIzq || inter1->extrDer < inter2->extrIzq;
-}
 
 ITree itree_crear() {
   return NULL;
+}
+
+int itree_vacio (ITree arbol) {
+  return arbol == NULL;
 }
 
 void itree_destruir (ITree arbol) {
@@ -34,7 +26,13 @@ void itree_destruir (ITree arbol) {
 int itree_altura (ITree arbol) {
   if (arbol == NULL)
     return -1;
-  else return arbol->altura;
+  else {
+    int alturaLeft = itree_altura (arbol->izq);
+    int alturaRight = itree_altura (arbol->der);
+    if (alturaLeft > alturaRight)
+      return alturaLeft + 1;
+    else return alturaRight + 1; 
+  }
 }
 
 int itree_balance_altura (ITree arbol) {
@@ -42,7 +40,6 @@ int itree_balance_altura (ITree arbol) {
 }
 
 ITree itree_rotar_derecha (ITree arbol) {
-  arbol->altura -= 1;
   INodo *aux = arbol->izq->der;
   arbol->izq->der = arbol;
   INodo *aux2 = arbol->izq;
@@ -52,7 +49,6 @@ ITree itree_rotar_derecha (ITree arbol) {
 }
 
 ITree itree_rotar_izquierda (ITree arbol) {
-  arbol->altura -= 1;
   INodo *aux = arbol->der->izq;
   arbol->der->izq = arbol;
   INodo *aux2 = arbol->der;
@@ -84,9 +80,12 @@ ITree itree_chequeo_balancear (ITree arbol) {
   else {
     if (balanceAltura < -1) {
       int balanceAlturaDer = itree_balance_altura (arbol->der);
-      if (balanceAlturaDer == -1)
+      if (balanceAlturaDer == -1) {
         arbol = itree_rotar_izquierda (arbol);
-      else arbol = itree_rotar_der_izq (arbol);
+      }
+      else {
+        arbol = itree_rotar_der_izq (arbol);
+      }
     }
   }
   return arbol;
@@ -122,38 +121,49 @@ ITree itree_max_extremo_der (ITree arbol) {
   }
   return arbol;
 }
+int mayor_int (int a, int b) {
+  if (a > b)
+    return a;
+  else return b;
+}
+ITree itree_actualizar_altura_der (ITree arbol) {
+  if (arbol->izq == NULL)
+    arbol->altura += 1;
+  else arbol->altura = mayor_int (arbol->der->altura + 1, arbol->izq->altura);
+  return arbol;
+}
+ITree itree_actualizar_altura_izq (ITree arbol) {
+  if (arbol->der == NULL)
+    arbol->altura += 1;
+  else arbol->altura = mayor_int (arbol->izq->altura + 1, arbol->der->altura);
+  return arbol;
+}
 
 ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
-  if (arbol == NULL) {
+  if (itree_vacio (arbol)) {
     arbol = malloc (sizeof(INodo));
     arbol->intervalo = intervalo;
     arbol->maxExtremoDer = intervalo->extrDer;
-    arbol->altura = 0;
     arbol->der = NULL;
     arbol->izq = NULL;
   }
   else {
     if (arbol->intervalo->extrIzq < intervalo->extrIzq) {
-      arbol->der = itree_insertar (arbol->der,intervalo);
-      if (arbol->izq == NULL)
-        arbol->altura += 1;
+      arbol->der = itree_insertar (arbol->der, intervalo);
     }
     else {
       if (arbol->intervalo->extrIzq > intervalo->extrIzq) {
         arbol->izq = itree_insertar (arbol->izq, intervalo);
-        if (arbol->der == NULL)
-          arbol->altura += 1;
       }
       else {
         if (arbol->intervalo->extrDer < intervalo->extrDer) {
-          arbol->der = itree_insertar (arbol->der,intervalo);
-          if (arbol->izq == NULL)
-            arbol->altura += 1;
+          arbol->der = itree_insertar (arbol->der, intervalo);
         }
         else {
-          arbol->izq = itree_insertar (arbol->izq, intervalo);
-          if (arbol->der == NULL)
-            arbol->altura += 1;
+          if (arbol->intervalo->extrDer > intervalo->extrDer) {
+            arbol->izq = itree_insertar (arbol->izq, intervalo);
+          }
+          else return arbol;
         }
       }
     }
@@ -185,22 +195,57 @@ int itree_contiene (ITree arbol, Intervalo *intervalo) {
   }
 }
 
-INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
-  if (arbol == NULL || arbol->maxExtremoDer < intervalo->extrIzq)//tendriamos q ver de q lo pregunte 1 sola vez a esto, por ende tendria q ser fuera de la funcion-
+INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo) {
+  if (arbol == NULL)
     return NULL;
   if (!intervalo_no_intersecar (arbol->intervalo, intervalo))
     return arbol;
   if (arbol->intervalo->extrIzq > intervalo->extrDer )
-    return itree_intersecar(arbol->izq,intervalo);
+    return itree_intersecarP(arbol->izq,intervalo);
   if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
-      return itree_intersecar (arbol->izq, intervalo);
-    else return itree_intersecar (arbol->der, intervalo);
-    
+    return itree_intersecarP (arbol->izq, intervalo);
+  else return itree_intersecarP (arbol->der, intervalo);
+}
+
+INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
+  if (arbol != NULL) {
+    if (arbol->maxExtremoDer < intervalo->extrIzq)
+      return NULL;
+    else return itree_intersecarP (arbol, intervalo);
+  }
+  else return NULL;
 }
 
 void imprimir_intervalo (void* dato) {
   ITree arbol = dato;
-  printf ("[%lf, %lf] ", arbol->intervalo->extrIzq, arbol->intervalo->extrDer);
+  printf ("[%lf, %lf]", arbol->intervalo->extrIzq, arbol->intervalo->extrDer);
+}
+
+void print2DUtil (ITree root, int space, FuncionVisitante funcion) 
+{ 
+    // Base case 
+    if (root == NULL) 
+        return; 
+  
+    // Increase distance between levels 
+    space += COUNT; 
+  
+    // Process right child first 
+    print2DUtil(root->der, space, funcion); 
+  
+    // Print current node after space 
+    // count 
+    printf("\n"); 
+    for (int i = COUNT; i < space; i++) 
+        printf(" "); 
+    funcion(root); 
+  
+    // Process left child 
+    print2DUtil(root->izq, space, funcion); 
+}
+
+void print2D (ITree root, FuncionVisitante funcion) {
+  print2DUtil (root, 0, funcion);
 }
 
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {

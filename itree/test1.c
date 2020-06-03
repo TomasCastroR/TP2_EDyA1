@@ -7,18 +7,19 @@ int main () {
   Intervalo *intervalo;
   double izquierdo, derecho;
   for (int i = 0; i < 5; ++i) {
-    printf ("ingrese un intervalo:");
+    printf ("\ningrese un intervalo:");
     scanf ("%lf, %lf", &izquierdo, &derecho);
     intervalo = intervalo_crear (izquierdo, derecho);
     arbol = itree_insertar (arbol, intervalo);
+    print2D (arbol, imprimir_intervalo);
   }
-  itree_recorrer_dfs (arbol, imprimir_intervalo);
+  /*itree_recorrer_dfs (arbol, imprimir_intervalo);
   intervalo = intervalo_crear (0.5, 0.75);
   INodo *nodo = itree_intersecar (arbol, intervalo);
   if (nodo) {
     printf ("SI INTERSECA\n");
-    imprimir_intervalo (nodo->intervalo);
+    imprimir_intervalo (nodo);
   }
-  else printf ("NO INTERSECA");
+  else printf ("NO INTERSECA");*/
   itree_destruir (arbol);
 }
