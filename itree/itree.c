@@ -195,6 +195,7 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
   if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
       return itree_intersecar (arbol->izq, intervalo);
     else return itree_intersecar (arbol->der, intervalo);
+    
 }
 
 void imprimir_intervalo (void* dato) {
