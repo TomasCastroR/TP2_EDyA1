@@ -200,9 +200,7 @@ INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo) {
     return NULL;
   if (!intervalo_no_intersecar (arbol->intervalo, intervalo))
     return arbol;
-  if (arbol->intervalo->extrIzq > intervalo->extrDer )
-    return itree_intersecarP(arbol->izq,intervalo);
-  if (arbol->izq->maxExtremoDer == arbol->maxExtremoDer)
+  if (!itree_vacio (arbol->izq) && arbol->izq->maxExtremoDer >= intervalo->extrIzq)
     return itree_intersecarP (arbol->izq, intervalo);
   else return itree_intersecarP (arbol->der, intervalo);
 }
