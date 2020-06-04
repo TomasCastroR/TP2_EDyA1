@@ -18,11 +18,14 @@ void itree_destruir (ITree arbol) {
   if (arbol != NULL) {
     itree_destruir(arbol->izq);
     itree_destruir(arbol->der);
-    free (arbol->intervalo);
-    free (arbol);
+    itree_destruir_nodo (arbol);
   }
 }
 
+void itree_destruir_nodo (ITree arbol) {
+  free (arbol->intervalo);
+  free (arbol);
+}
 int itree_altura (ITree arbol) {
   if (arbol == NULL)
     return -1;
@@ -126,18 +129,18 @@ int mayor_int (int a, int b) {
     return a;
   else return b;
 }
-ITree itree_actualizar_altura_der (ITree arbol) {
-  if (arbol->izq == NULL)
-    arbol->altura += 1;
-  else arbol->altura = mayor_int (arbol->der->altura + 1, arbol->izq->altura);
-  return arbol;
-}
-ITree itree_actualizar_altura_izq (ITree arbol) {
-  if (arbol->der == NULL)
-    arbol->altura += 1;
-  else arbol->altura = mayor_int (arbol->izq->altura + 1, arbol->der->altura);
-  return arbol;
-}
+// ITree itree_actualizar_altura_der (ITree arbol) {
+//   if (arbol->izq == NULL)
+//     arbol->altura += 1;
+//   else arbol->altura = mayor_int (arbol->der->altura + 1, arbol->izq->altura);
+//   return arbol;
+// }
+// ITree itree_actualizar_altura_izq (ITree arbol) {
+//   if (arbol->der == NULL)
+//     arbol->altura += 1;
+//   else arbol->altura = mayor_int (arbol->izq->altura + 1, arbol->der->altura);
+//   return arbol;
+// }
 
 ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
   if (itree_vacio (arbol)) {
@@ -173,7 +176,63 @@ ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
   return arbol;
 }
 
-void itree_eliminar (ITree arbol, Intervalo *intervalo);
+ITree itree_eliminar_nodo (ITree arbol) {
+  if (itree_vacio (arbol->der) && itree_vacio (arbol->izq)) {
+    itree_destruir_nodo (arbol);
+    return NULL;
+  }
+  if (!itree_vacio (arbol->der) && !itree_vacio (arbol->izq)) {
+    INodo *aux = arbol->izq;
+    for (; aux->izq->izq != NULL; aux = aux->izq);
+    Intervalo *sucesor = aux->izq->intervalo;
+    if (!itree_vacio (aux->izq->der)) {
+      INodo *aux2 = aux->izq->der;
+      free (aux->izq);
+      aux->izq = aux2;
+    }
+    else free (aux->izq);
+    free (arbol->intervalo);
+    aux = itree_max_extremo_der (aux);
+    arbol->intervalo = sucesor;
+    return arbol;
+  }
+  if (!itree_vacio (arbol->der)) {
+    INodo *aux = arbol->der;
+    itree_destruir_nodo (arbol);
+    return aux;
+  }
+  else {
+    INodo *aux = arbol->izq;
+    itree_destruir_nodo (arbol);
+    return aux;
+  }
+}
+
+ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
+  if (itree_vacio (arbol))
+    return NULL;
+  if (intervalo_igualdad (arbol->intervalo, intervalo))
+    arbol = itree_eliminar_nodo (arbol);
+  else {
+    if (arbol->intervalo->extrIzq < intervalo->extrIzq) {
+      arbol->der = itree_eliminar (arbol->der, intervalo);
+    }
+    else {
+      if (arbol->intervalo->extrIzq > intervalo->extrIzq) {
+        arbol->izq = itree_eliminar (arbol->izq, intervalo);
+      }
+      else {
+        if (arbol->intervalo->extrDer < intervalo->extrDer) {
+          arbol->der = itree_eliminar (arbol->der, intervalo);
+        }
+        else arbol->izq = itree_eliminar (arbol->izq, intervalo);
+      }
+    }
+  }
+  arbol = itree_chequeo_balancear (arbol);
+  arbol = itree_max_extremo_der (arbol);
+  return arbol;
+}
 
 int itree_contiene (ITree arbol, Intervalo *intervalo) {
   if (arbol == NULL)
@@ -214,9 +273,8 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
   else return NULL;
 }
 
-void imprimir_intervalo (void* dato) {
-  ITree arbol = dato;
-  printf ("[%lf, %lf]", arbol->intervalo->extrIzq, arbol->intervalo->extrDer);
+void imprimir_intervalo (ITree dato) {
+  printf ("[%lf, %lf]", dato->intervalo->extrIzq, dato->intervalo->extrDer);
 }
 
 void print2DUtil (ITree root, int space, FuncionVisitante funcion) 

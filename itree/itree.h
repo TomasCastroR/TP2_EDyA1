@@ -6,14 +6,13 @@
 typedef struct _INodo {
   Intervalo* intervalo;
   double maxExtremoDer;
-  int altura;
   struct _INodo* der;
   struct _INodo* izq;
 }INodo;
 
 typedef INodo* ITree;
 
-typedef void (*FuncionVisitante) (void* dato);
+typedef void (*FuncionVisitante) (ITree dato);
 
 ITree itree_crear();
 
@@ -25,7 +24,11 @@ int itree_contiene (ITree arbol, Intervalo *intervalo);
 
 ITree itree_insertar (ITree arbol, Intervalo *intervalo);
 
-void itree_eliminar (ITree arbol, Intervalo *intervalo);
+ITree itree_eliminar (ITree arbol, Intervalo *intervalo);
+
+ITree itree_eliminar_nodo (ITree arbol);
+
+void itree_destruir_nodo (ITree arbol);
 
 INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo);
 
@@ -51,11 +54,12 @@ ITree itree_rotar_izq_der (ITree arbol);
 
 ITree itree_max_extremo_der (ITree arbol);
 
-void imprimir_intervalo (void* dato);
+void imprimir_intervalo (ITree dato);
 
 double mayor (double a, double b);
 
 void print2DUtil (ITree root, int space, FuncionVisitante funcion);
+
 void print2D (ITree root, FuncionVisitante funcion);
 
 #endif
