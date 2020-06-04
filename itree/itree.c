@@ -4,8 +4,6 @@
 
 #define COUNT 10
 
-
-
 ITree itree_crear() {
   return NULL;
 }
@@ -48,6 +46,7 @@ ITree itree_rotar_derecha (ITree arbol) {
   INodo *aux2 = arbol->izq;
   arbol->izq = aux;
   arbol = aux2;
+  arbol->der = itree_max_extremo_der (arbol->der);
   return arbol;
 }
 
@@ -57,6 +56,7 @@ ITree itree_rotar_izquierda (ITree arbol) {
   INodo *aux2 = arbol->der;
   arbol->der = aux;
   arbol = aux2;
+  arbol->izq = itree_max_extremo_der (arbol->izq);
   return arbol;
 }
 
@@ -177,35 +177,39 @@ ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
 }
 
 ITree itree_eliminar_nodo (ITree arbol) {
+  INodo *aux, *aux2;
   if (itree_vacio (arbol->der) && itree_vacio (arbol->izq)) {
     itree_destruir_nodo (arbol);
-    return NULL;
+    aux = NULL;
   }
   if (!itree_vacio (arbol->der) && !itree_vacio (arbol->izq)) {
-    INodo *aux = arbol->izq;
+    aux = arbol->der;
     for (; aux->izq->izq != NULL; aux = aux->izq);
     Intervalo *sucesor = aux->izq->intervalo;
     if (!itree_vacio (aux->izq->der)) {
-      INodo *aux2 = aux->izq->der;
-      free (aux->izq);
-      aux->izq = aux2;
+      aux2 = aux->izq;
+      aux->izq = aux->izq->der;
+      free (aux2);
     }
-    else free (aux->izq);
+    else {
+      aux2 = aux->izq;
+      aux->izq = NULL;
+      free (aux2);
+    }
     free (arbol->intervalo);
     aux = itree_max_extremo_der (aux);
     arbol->intervalo = sucesor;
     return arbol;
   }
   if (!itree_vacio (arbol->der)) {
-    INodo *aux = arbol->der;
+    aux = arbol->der;
     itree_destruir_nodo (arbol);
-    return aux;
   }
   else {
-    INodo *aux = arbol->izq;
+    aux = arbol->izq;
     itree_destruir_nodo (arbol);
-    return aux;
   }
+  return aux;
 }
 
 ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
@@ -257,7 +261,7 @@ int itree_contiene (ITree arbol, Intervalo *intervalo) {
 INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo) {
   if (arbol == NULL)
     return NULL;
-  if (!intervalo_no_intersecar (arbol->intervalo, intervalo))
+  if (intervalo_intersecar (arbol->intervalo, intervalo))
     return arbol;
   if (!itree_vacio (arbol->izq) && arbol->izq->maxExtremoDer >= intervalo->extrIzq)
     return itree_intersecarP (arbol->izq, intervalo);
@@ -274,34 +278,33 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
 }
 
 void imprimir_intervalo (ITree dato) {
-  printf ("[%lf, %lf]", dato->intervalo->extrIzq, dato->intervalo->extrDer);
+  printf ("[%lf, %lf] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
 }
 
-void print2DUtil (ITree root, int space, FuncionVisitante funcion) 
-{ 
-    // Base case 
-    if (root == NULL) 
-        return; 
+void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) { 
+  // Base case 
+  if (arbol == NULL) 
+    return; 
   
-    // Increase distance between levels 
-    space += COUNT; 
+  // Increase distance between levels 
+  space += COUNT; 
   
-    // Process right child first 
-    print2DUtil(root->der, space, funcion); 
+  // Process right child first 
+  print2DUtil (arbol->der, space, funcion); 
   
-    // Print current node after space 
-    // count 
-    printf("\n"); 
-    for (int i = COUNT; i < space; i++) 
-        printf(" "); 
-    funcion(root); 
+  // Print current node after space 
+  // count 
+  printf("\n"); 
+  for (int i = COUNT; i < space; i++) 
+    printf(" "); 
+  funcion(arbol); 
   
-    // Process left child 
-    print2DUtil(root->izq, space, funcion); 
+  // Process left child 
+  print2DUtil (arbol->izq, space, funcion); 
 }
 
-void print2D (ITree root, FuncionVisitante funcion) {
-  print2DUtil (root, 0, funcion);
+void print2D (ITree arbol, FuncionVisitante funcion) {
+  print2DUtil (arbol, 0, funcion);
 }
 
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {

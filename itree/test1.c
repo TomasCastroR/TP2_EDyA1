@@ -6,7 +6,7 @@ int main () {
   ITree arbol = itree_crear();
   Intervalo *intervalo;
   double izquierdo, derecho;
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < 3; ++i) {
     printf ("\ningrese un intervalo:");
     scanf ("%lf, %lf", &izquierdo, &derecho);
     intervalo = intervalo_crear (izquierdo, derecho);

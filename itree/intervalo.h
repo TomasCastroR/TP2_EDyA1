@@ -10,6 +10,6 @@ Intervalo* intervalo_crear (double extIzq, double extDer);
 
 int intervalo_igualdad (Intervalo *inter1, Intervalo *inter2);
 
-int intervalo_no_intersecar (Intervalo *inter1, Intervalo *inter2);
+int intervalo_intersecar (Intervalo *inter1, Intervalo *inter2);
 
 #endif
