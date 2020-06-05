@@ -1,4 +1,5 @@
 #include "itree.h"
+#include "cola/cola.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -13,7 +14,7 @@ int itree_vacio (ITree arbol) {
 }
 
 void itree_destruir (ITree arbol) {
-  if (arbol != NULL) {
+  if (!itree_vacio (arbol)) {
     itree_destruir(arbol->izq);
     itree_destruir(arbol->der);
     itree_destruir_nodo (arbol);
@@ -104,45 +105,30 @@ double mayor (double a, double b) {
 }
 
 ITree itree_max_extremo_der (ITree arbol) {
-  double maximoExtDer;
-  if (arbol->der == NULL && arbol->izq == NULL)
-    arbol->maxExtremoDer = arbol->intervalo->extrDer;
-  else {
-    if (arbol->der != NULL && arbol->izq != NULL) {
-      maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->izq->maxExtremoDer);
-      maximoExtDer = mayor (maximoExtDer, arbol->maxExtremoDer);
-      arbol->maxExtremoDer = maximoExtDer;
-    }
+  if (!itree_vacio (arbol)) {
+    double maximoExtDer;
+    if (itree_vacio (arbol->izq) && itree_vacio (arbol->der))
+      arbol->maxExtremoDer = arbol->intervalo->extrDer;
     else {
-      if (arbol->der != NULL) {
-        maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->maxExtremoDer);
+      if (!itree_vacio (arbol->izq) && !itree_vacio (arbol->der)) {
+        maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->izq->maxExtremoDer);
+        maximoExtDer = mayor (maximoExtDer, arbol->maxExtremoDer);
         arbol->maxExtremoDer = maximoExtDer;
       }
       else {
-        maximoExtDer = mayor (arbol->izq->maxExtremoDer, arbol->maxExtremoDer);
-        arbol->maxExtremoDer = maximoExtDer;
+        if (!itree_vacio (arbol->der)) {
+          maximoExtDer = mayor (arbol->der->maxExtremoDer, arbol->maxExtremoDer);
+          arbol->maxExtremoDer = maximoExtDer;
+        }
+        else {
+          maximoExtDer = mayor (arbol->izq->maxExtremoDer, arbol->maxExtremoDer);
+          arbol->maxExtremoDer = maximoExtDer;
+        }
       }
     }
   }
   return arbol;
 }
-int mayor_int (int a, int b) {
-  if (a > b)
-    return a;
-  else return b;
-}
-// ITree itree_actualizar_altura_der (ITree arbol) {
-//   if (arbol->izq == NULL)
-//     arbol->altura += 1;
-//   else arbol->altura = mayor_int (arbol->der->altura + 1, arbol->izq->altura);
-//   return arbol;
-// }
-// ITree itree_actualizar_altura_izq (ITree arbol) {
-//   if (arbol->der == NULL)
-//     arbol->altura += 1;
-//   else arbol->altura = mayor_int (arbol->izq->altura + 1, arbol->der->altura);
-//   return arbol;
-// }
 
 ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
   if (itree_vacio (arbol)) {
@@ -153,22 +139,17 @@ ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
     arbol->izq = NULL;
   }
   else {
-    if (arbol->intervalo->extrIzq < intervalo->extrIzq) {
+    if (arbol->intervalo->extrIzq < intervalo->extrIzq)
       arbol->der = itree_insertar (arbol->der, intervalo);
-    }
     else {
-      if (arbol->intervalo->extrIzq > intervalo->extrIzq) {
+      if (arbol->intervalo->extrIzq > intervalo->extrIzq)
         arbol->izq = itree_insertar (arbol->izq, intervalo);
-      }
       else {
-        if (arbol->intervalo->extrDer < intervalo->extrDer) {
+        if (arbol->intervalo->extrDer < intervalo->extrDer)
           arbol->der = itree_insertar (arbol->der, intervalo);
-        }
         else {
-          if (arbol->intervalo->extrDer > intervalo->extrDer) {
+          if (arbol->intervalo->extrDer > intervalo->extrDer)
             arbol->izq = itree_insertar (arbol->izq, intervalo);
-          }
-          else return arbol;
         }
       }
     }
@@ -179,43 +160,36 @@ ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
 }
 
 ITree itree_eliminar_nodo (ITree arbol) {
-  INodo *aux, *aux2;
+  INodo *aux, *aux2, *padreSucesor;
   if (itree_vacio (arbol->der) && itree_vacio (arbol->izq)) {
-    itree_destruir_nodo (arbol);
-    aux = NULL;
+    aux = arbol;
+    arbol = NULL;
+    itree_destruir_nodo (aux);
   }
   else {
     if (!itree_vacio (arbol->der) && !itree_vacio (arbol->izq)) {
-    aux = arbol->der;
-    for (; aux->izq->izq != NULL; aux = aux->izq);
-    Intervalo *sucesor = aux->izq->intervalo;
-    if (!itree_vacio (aux->izq->der)) {
-      aux2 = aux->izq;
-      aux->izq = aux->izq->der;
-      free (aux2);
-    }
-    else {
-      aux2 = aux->izq;
-      aux->izq = NULL;
-      free (aux2);
-    }
-    free (arbol->intervalo);
-    aux = itree_max_extremo_der (aux);
-    arbol->intervalo = sucesor;
-    return arbol;
-    }
+      aux = arbol->der;
+      for (; !itree_vacio (aux->izq); aux = aux->izq);
+      Intervalo *sucesor = intervalo_crear (aux->intervalo->extrIzq, aux->intervalo->extrDer);
+      aux = itree_eliminar_nodo (aux);
+      aux = itree_max_extremo_der (aux);
+      free (arbol->intervalo);
+      arbol->intervalo = sucesor;
+      }
     else {
       if (!itree_vacio (arbol->der)) {
-        aux = arbol->der;
-        itree_destruir_nodo (arbol);
+      aux = arbol;
+      arbol = arbol->der;
+      itree_destruir_nodo (aux);
       }
       else {
-        aux = arbol->izq;
-        itree_destruir_nodo (arbol);
+        aux = arbol;
+        arbol = arbol->izq;
+        itree_destruir_nodo (aux);
       }
     }
   }
-  return aux;
+  return arbol;
 }
 
 ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
@@ -224,25 +198,20 @@ ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
   if (intervalo_igualdad (arbol->intervalo, intervalo))
     arbol = itree_eliminar_nodo (arbol);
   else {
-    if (arbol->intervalo->extrIzq < intervalo->extrIzq) {
+    if (arbol->intervalo->extrIzq < intervalo->extrIzq)
       arbol->der = itree_eliminar (arbol->der, intervalo);
-    }
     else {
-      if (arbol->intervalo->extrIzq > intervalo->extrIzq) {
+      if (arbol->intervalo->extrIzq > intervalo->extrIzq)
         arbol->izq = itree_eliminar (arbol->izq, intervalo);
-      }
       else {
-        if (arbol->intervalo->extrDer < intervalo->extrDer) {
+        if (arbol->intervalo->extrDer < intervalo->extrDer)
           arbol->der = itree_eliminar (arbol->der, intervalo);
-        }
         else arbol->izq = itree_eliminar (arbol->izq, intervalo);
       }
     }
   }
-  if (!itree_vacio (arbol)) {
-    arbol = itree_chequeo_balancear (arbol);
-    arbol = itree_max_extremo_der (arbol);
-  }
+  arbol = itree_chequeo_balancear (arbol);
+  arbol = itree_max_extremo_der (arbol);
   return arbol;
 }
 
@@ -277,7 +246,7 @@ INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo) {
 }
 
 INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
-  if (arbol != NULL) {
+  if (!itree_vacio (arbol)) {
     if (arbol->maxExtremoDer < intervalo->extrIzq)
       return NULL;
     else return itree_intersecarP (arbol, intervalo);
@@ -286,12 +255,12 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
 }
 
 void imprimir_intervalo (ITree dato) {
-  printf ("[%.3lf, %.3lf] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
+  printf ("[%g, %g] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
 }
 
 void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) { 
   // Base case 
-  if (arbol == NULL) 
+  if (itree_vacio (arbol)) 
     return; 
   
   // Increase distance between levels 
@@ -300,8 +269,7 @@ void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) {
   // Process right child first 
   print2DUtil (arbol->der, space, funcion); 
   
-  // Print current node after space 
-  // count 
+  // Print current node after space count 
   printf("\n"); 
   for (int i = COUNT; i < space; i++) 
     printf(" "); 
@@ -316,11 +284,25 @@ void print2D (ITree arbol, FuncionVisitante funcion) {
 }
 
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {
-  if (arbol == NULL)
+  if (itree_vacio (arbol))
     return;
   itree_recorrer_dfs (arbol->izq, funcion);
   funcion (arbol);
   itree_recorrer_dfs (arbol->der, funcion);
 }
 
-void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion);
+void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion) {
+  Cola *cola = cola_crear();
+  cola_encolar (&cola, arbol);
+  INodo *nodo;
+  while (!cola_vacio (cola)) {
+    nodo = cola_primero (cola);
+    cola_desenColar (&cola);
+    funcion (nodo);
+    if (!itree_vacio (nodo->izq))
+      cola_encolar (&cola, nodo->izq);
+    if (!itree_vacio (nodo->der))
+      cola_encolar (&cola, nodo->der);
+  }
+  cola_destruir (cola);
+}
