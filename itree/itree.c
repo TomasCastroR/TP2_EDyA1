@@ -37,7 +37,9 @@ int itree_altura (ITree arbol) {
 }
 
 int itree_balance_altura (ITree arbol) {
-  return itree_altura (arbol->izq) - itree_altura (arbol->der);
+  if (itree_vacio (arbol))
+    return 0;
+  else return itree_altura (arbol->izq) - itree_altura (arbol->der);
 }
 
 ITree itree_rotar_derecha (ITree arbol) {
@@ -182,7 +184,8 @@ ITree itree_eliminar_nodo (ITree arbol) {
     itree_destruir_nodo (arbol);
     aux = NULL;
   }
-  if (!itree_vacio (arbol->der) && !itree_vacio (arbol->izq)) {
+  else {
+    if (!itree_vacio (arbol->der) && !itree_vacio (arbol->izq)) {
     aux = arbol->der;
     for (; aux->izq->izq != NULL; aux = aux->izq);
     Intervalo *sucesor = aux->izq->intervalo;
@@ -200,14 +203,17 @@ ITree itree_eliminar_nodo (ITree arbol) {
     aux = itree_max_extremo_der (aux);
     arbol->intervalo = sucesor;
     return arbol;
-  }
-  if (!itree_vacio (arbol->der)) {
-    aux = arbol->der;
-    itree_destruir_nodo (arbol);
-  }
-  else {
-    aux = arbol->izq;
-    itree_destruir_nodo (arbol);
+    }
+    else {
+      if (!itree_vacio (arbol->der)) {
+        aux = arbol->der;
+        itree_destruir_nodo (arbol);
+      }
+      else {
+        aux = arbol->izq;
+        itree_destruir_nodo (arbol);
+      }
+    }
   }
   return aux;
 }
@@ -233,8 +239,10 @@ ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
       }
     }
   }
-  arbol = itree_chequeo_balancear (arbol);
-  arbol = itree_max_extremo_der (arbol);
+  if (!itree_vacio (arbol)) {
+    arbol = itree_chequeo_balancear (arbol);
+    arbol = itree_max_extremo_der (arbol);
+  }
   return arbol;
 }
 
@@ -278,7 +286,7 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
 }
 
 void imprimir_intervalo (ITree dato) {
-  printf ("[%lf, %lf] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
+  printf ("[%.3lf, %.3lf] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
 }
 
 void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) { 
