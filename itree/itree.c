@@ -171,8 +171,7 @@ ITree itree_eliminar_nodo (ITree arbol) {
       aux = arbol->der;
       for (; !itree_vacio (aux->izq); aux = aux->izq);
       Intervalo *sucesor = intervalo_crear (aux->intervalo->extrIzq, aux->intervalo->extrDer);
-      aux = itree_eliminar_nodo (aux);
-      aux = itree_max_extremo_der (aux);
+      arbol->der = itree_eliminar (arbol->der, aux->intervalo);
       free (arbol->intervalo);
       arbol->intervalo = sucesor;
       }
