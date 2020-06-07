@@ -1,6 +1,6 @@
 FLAGS = -c -Wall -Werror -Wextra -std=c99 -g
 ITREE = ../itree/itree
-COLA = ../cola/cola
+COLA = ../itree/cola/cola
 
 interprete: interprete.c itree.o 
 	gcc -o interprete interprete.c itree.o 

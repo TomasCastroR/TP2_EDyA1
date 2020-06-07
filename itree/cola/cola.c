@@ -38,5 +38,3 @@ void cola_desenColar (Cola **cola) {
     (*cola)->primero = 0;
   else (*cola)->primero += 1;
 }
-
-void cola_imprimir (Cola *cola);

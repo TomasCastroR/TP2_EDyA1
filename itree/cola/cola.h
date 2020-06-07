@@ -21,6 +21,4 @@ void* cola_primero (Cola *cola);
 
 void cola_desenColar (Cola **cola);
 
-void cola_imprimir (Cola *cola);
-
 #endif
