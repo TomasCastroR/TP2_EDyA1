@@ -33,7 +33,7 @@ int itree_altura (ITree arbol) {
     int alturaRight = itree_altura (arbol->der);
     if (alturaLeft > alturaRight)
       return alturaLeft + 1;
-    else return alturaRight + 1; 
+    else return alturaRight + 1;
   }
 }
 
@@ -160,7 +160,7 @@ ITree itree_insertar (ITree arbol, Intervalo *intervalo) {
 }
 
 ITree itree_eliminar_nodo (ITree arbol) {
-  INodo *aux, *aux2, *padreSucesor;
+  INodo *aux;
   if (itree_vacio (arbol->der) && itree_vacio (arbol->izq)) {
     aux = arbol;
     arbol = NULL;
@@ -257,25 +257,25 @@ void imprimir_intervalo (ITree dato) {
   printf ("[%g, %g] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
 }
 
-void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) { 
-  // Base case 
-  if (itree_vacio (arbol)) 
-    return; 
-  
-  // Increase distance between levels 
-  space += COUNT; 
-  
-  // Process right child first 
-  print2DUtil (arbol->der, space, funcion); 
-  
-  // Print current node after space count 
-  printf("\n"); 
-  for (int i = COUNT; i < space; i++) 
-    printf(" "); 
-  funcion(arbol); 
-  
-  // Process left child 
-  print2DUtil (arbol->izq, space, funcion); 
+void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) {
+  // Base case
+  if (itree_vacio (arbol))
+    return;
+
+  // Increase distance between levels
+  space += COUNT;
+
+  // Process right child first
+  print2DUtil (arbol->der, space, funcion);
+
+  // Print current node after space count
+  printf("\n");
+  for (int i = COUNT; i < space; i++)
+    printf(" ");
+  funcion(arbol);
+
+  // Process left child
+  print2DUtil (arbol->izq, space, funcion);
 }
 
 void print2D (ITree arbol, FuncionVisitante funcion) {

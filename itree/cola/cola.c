@@ -14,7 +14,6 @@ int cola_vacio (Cola* cola) {
 }
 
 void cola_destruir (Cola* cola) {
-  free (cola->datos);
   free (cola);
 }
 
