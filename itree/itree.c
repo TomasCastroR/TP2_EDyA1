@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define COUNT 10
-
 ITree itree_crear() {
   return NULL;
 }
@@ -214,26 +212,6 @@ ITree itree_eliminar (ITree arbol, Intervalo *intervalo) {
   return arbol;
 }
 
-int itree_contiene (ITree arbol, Intervalo *intervalo) {
-  if (arbol == NULL)
-    return 0;
-  if (intervalo_igualdad (arbol->intervalo, intervalo))
-    return 1;
-  else {
-    if (arbol->intervalo->extrIzq < intervalo->extrIzq)
-      return itree_contiene (arbol->der, intervalo);
-    else {
-      if (arbol->intervalo->extrIzq > intervalo->extrIzq)
-        return itree_contiene (arbol->izq, intervalo);
-      else {
-        if (arbol->intervalo->extrDer < intervalo->extrDer)
-          return itree_contiene (arbol->der, intervalo);
-        else return itree_contiene (arbol->izq, intervalo);
-      }
-    }
-  }
-}
-
 INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo) {
   if (arbol == NULL)
     return NULL;
@@ -255,31 +233,6 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo) {
 
 void imprimir_intervalo (ITree dato) {
   printf ("[%g, %g] ", dato->intervalo->extrIzq, dato->intervalo->extrDer);
-}
-
-void print2DUtil (ITree arbol, int space, FuncionVisitante funcion) {
-  // Base case
-  if (itree_vacio (arbol))
-    return;
-
-  // Increase distance between levels
-  space += COUNT;
-
-  // Process right child first
-  print2DUtil (arbol->der, space, funcion);
-
-  // Print current node after space count
-  printf("\n");
-  for (int i = COUNT; i < space; i++)
-    printf(" ");
-  funcion(arbol);
-
-  // Process left child
-  print2DUtil (arbol->izq, space, funcion);
-}
-
-void print2D (ITree arbol, FuncionVisitante funcion) {
-  print2DUtil (arbol, 0, funcion);
 }
 
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion) {
