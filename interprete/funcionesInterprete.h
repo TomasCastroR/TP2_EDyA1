@@ -3,6 +3,8 @@
 
 #include "../itree/itree.h"
 
+void imprimir_menu ();
+
 int validar_comando (char* comando);
 
 int validar_formato (char* comando);

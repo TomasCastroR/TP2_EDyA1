@@ -1,6 +1,6 @@
 FLAGS = -c -Wall -Werror -Wextra -std=c99 -g
 ITREE = ../itree/itree
-INTERVALO = ../itree/intervalo
+INTERVALO = ../itree/intervalo/intervalo
 COLA = ../itree/cola/cola
 
 interprete: interprete.c itree.o cola.o intervalo.o funcionesInterprete.o

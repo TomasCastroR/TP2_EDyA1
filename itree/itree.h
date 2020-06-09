@@ -1,7 +1,7 @@
 #ifndef __ITREE_H__
 #define __ITREE_H__
 
-#include "intervalo.h"
+#include "intervalo/intervalo.h"
 
 typedef struct _INodo {
   Intervalo* intervalo;
