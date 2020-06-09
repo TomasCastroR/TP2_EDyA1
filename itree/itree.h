@@ -43,11 +43,13 @@ Recibe el nodo de un arbol y lo libera.*/
 void itree_destruir_nodo (ITree arbol);
 
 /* itree_intersecarP: ITree, Intervalo -> *INodo
-Recibe un arbol y un intervalo*/
+Recibe un arbol y un intervalo
+Chequea si existe hay alguna interseccion entre el intervalo y algun nodo del arbol. */
 INodo* itree_intersecarP (ITree arbol, Intervalo *intervalo);
 
 /* itree_intersecar: ITree, Intervalo -> *INodo
-Recibe un arbol y un intervalo*/
+Recibe un arbol y un intervalo
+Contempla solo 1 caso en particular de la interseccion.*/
 INodo* itree_intersecar (ITree arbol, Intervalo *intervalo);
 
 /* itree_recorre_dfs: ITree, FuncionVisitante -> 
