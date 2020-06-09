@@ -31,7 +31,7 @@ void* cola_primero (Cola *cola) {
   else return cola->datos[cola->primero + 1];
 }
 
-void cola_desenColar (Cola **cola) {
+void cola_desencolar (Cola **cola) {
   assert (!cola_vacio (*cola));
   if ((*cola)->primero == MAX_COLA - 1)
     (*cola)->primero = 0;

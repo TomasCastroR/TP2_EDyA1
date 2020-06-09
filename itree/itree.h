@@ -35,7 +35,7 @@ lo elimina.*/
 ITree itree_eliminar (ITree arbol, Intervalo *intervalo);
 
 /* itree_eliminar_nodo: ITree -> ITree
-                  ¿?*/
+Recibe un arbol, y segun el caso a contemplar aplica la eliminacion correspondiente*/
 ITree itree_eliminar_nodo (ITree arbol);
 
 /* itree_destruir_nodo: ITree ->
@@ -62,29 +62,47 @@ Recibe un arbol y una funcion.
  Recorre el arbol utilizando el algoritmo bfs y lo va imprimiendo */
 void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion);
 
-/* itree_altura: ITree -> int*/
+/* itree_altura: ITree -> int
+Recibe un arbol y devuelve su altura*/
 int itree_altura (ITree arbol);
 
 /* itree_balance_altura: ITree -> int
-*/
+Recibe un arbol y devuelve la diferencia de altura de sus hijos*/
 int itree_balance_altura (ITree arbol);
 
 /* itree_chequeo_balancear: ITree -> ITree
-*/
+Recibe un arbol, calcula su factor de balance y aplica su rotacion correspondiente
+si es necesario.*/
 ITree itree_chequeo_balancear (ITree arbol);
 
+/* itree_rotar_derecha: ITree -> ITree
+Recibe un arbol y rota el arbol correspondiente hacia la derecha*/
 ITree itree_rotar_derecha (ITree arbol);
 
+/* itree_rotar_derecha: ITree -> ITree
+Recibe un arbol y rota el arbol correspondiente hacia la izquierda*/
 ITree itree_rotar_izquierda (ITree arbol);
 
+/* itree_rotar_derecha: ITree -> ITree
+Recibe un arbol y rota el arbol correspondiente hacia la derecha y despues 
+hacia la izquierda*/
 ITree itree_rotar_der_izq (ITree arbol);
 
+/* itree_rotar_derecha: ITree -> ITree
+Recibe un arbol y rota el arbol correspondiente hacia la izquierda y despues
+hacia la derecha*/
 ITree itree_rotar_izq_der (ITree arbol);
 
+/* itree_max_extremo_der: ITree -> ITree
+Recibe un arbol y determina el maximo extremo derecho del arbol*/
 ITree itree_max_extremo_der (ITree arbol);
 
+/* imprimir_intervalo: ITree -> 
+Recibe un arbol e imprime su intervalo*/
 void imprimir_intervalo (ITree dato);
 
+/* mayor: double, double -> double
+Recibe 2 double y devuelve el mayor*/
 double mayor (double a, double b);
 
 #endif

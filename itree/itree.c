@@ -94,6 +94,7 @@ ITree itree_chequeo_balancear (ITree arbol) {
   }
   return arbol;
 }
+
 double mayor (double a, double b) {
   double mayor;
   if (a > b)
@@ -249,7 +250,7 @@ void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion) {
   INodo *nodo;
   while (!cola_vacio (cola)) {
     nodo = cola_primero (cola);
-    cola_desenColar (&cola);
+    cola_desencolar (&cola);
     funcion (nodo);
     if (!itree_vacio (nodo->izq))
       cola_encolar (&cola, nodo->izq);

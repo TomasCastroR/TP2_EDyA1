@@ -12,6 +12,7 @@ void imprimir_menu () {
   printf ("salir: destruye el arbol y termina el programa\n");
   printf ("\n");
 }
+
 int validar_comando (char* comando) {
   int idComando;
   switch (comando[0]) {
