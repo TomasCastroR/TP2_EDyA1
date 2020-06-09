@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+void imprimir_menu () {
+  printf ("i [a, b]: inserta el intervalo [a, b] en el arbol\n");
+  printf ("e [a, b]: elimina el intervalo [a, b] del arbol\n");
+  printf ("? [a, b]: determina si [a, b] interseca con algun intervalo del arbol. En caso positivo muestra tal intervalo.\n");
+  printf ("dfs: recorre el arbol utilizando el algoritmo DFS\n");
+  printf ("bfs: recorre el arbol utilizando el algoritmo BFS\n");
+  printf ("salir: destruye el arbol y termina el programa\n");
+  printf ("\n");
+}
 int validar_comando (char* comando) {
   int idComando;
   switch (comando[0]) {
