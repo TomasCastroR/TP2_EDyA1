@@ -1,7 +1,78 @@
 \documentclass{article}
-\title{Trabajo Práctico N°2 \\ \large Estructura de Datos y Algoritmos I}
-\author{Barbageleta Blas \\ Castro Rojas Tomás}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{red},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	framexleftmargin=5mm, frame=shadowbox, rulesepcolor=\color{gray}
+}
+\lstset{style=mystyle}
 \begin{document}
+	\title{Trabajo Práctico N°2 \\ \large Estructura de Datos y Algoritmos I}
+	\author{Barbageleta Blas \\ Castro Rojas Tomás}
+	\date {Junio 10, 2020}
 	\maketitle
-	contenidos...
+	\newpage
+	\section{Introducción}
+	El objetivo de este trabajo es la implementación de arboles de intervalos cerrados de numeros reales con la motivacion de realizar operaciones como insertar y eliminar intervalos de manera dinamica, y consultar la interseccion de dos intervalos de forma eficiente. El tipo de arbol implementado es Arbol AVL.
+	\section{Organización y funcionamiento}
+	El Trabajo Práctico se organiza en dos carpetas. En la carpeta \verb|itree| se encuentra la implementacion de arbol de intervalos juntos con la implementacion de la estructuras Intervalo y la implementacion de Cola para el recorrido utilizando BFS.
+	\\Dentro de la carpeta \verb|interprete| se encuentran el makefile con las reglas de compilación, el archivo interprete.c que es el ejecuta el interprete y dos archivos con funciones que validan la entrada para el interprete.
+	\\Para compilar el Trabajo Práctico ejecutar el comando: \\
+	\verb|make interprete|\\
+	\section{Dificultades}
+	La estructura implementada en este trabajo fue la siguiente: \\
+	\begin{lstlisting}[language=C]
+	typedef struct _INodo {
+	Intervalo* intervalo;
+	double maxExtremoDer;
+	struct _INodo* der;
+	struct _INodo* izq;
+	}INodo;
+	
+	typedef INodo* ITree;
+	\end{lstlisting}
+	Se intento expandir esta estructura agregando un campo \verb|altura| donde guardaba la altura del arbol para no estar calculandola cada vez que queriamos determinar si el arbol estaba balanceado o no. Tratar de determinar como se actualizaba la altura luego de agregar un nodo era bastante engorroso pero el verdadero problema era que cuando se realizaba una rotación, cualquiera de ellas, no encontramos forma de generalizar el comportamiento de cambio de altura. Entonces terminamos desistiendo de esta idea. \\
+	De igual modo se penso en un campo \verb|factorBalance| pero surgian los mismos problemas que con el campo altura.\\
+	Ademas, la funcion \verb|itree_insertar| esta implementada de tal modo que si se intenta ingresar un intervalo que ya se encuentra en el arbol, no realiza ninguna operacion y comienza a ir para atras terminando las distintas recursiones. Con el campo \verb|altura| o \verb|factorBalance| hubieramos tenido que tener una manera de decir si se agregó o no un nodo.\\\\
+	Luego, tuvimos bastantes dificultades para implentar las funciones \verb|itree_intersecar| e \verb|itree_eliminar|.\\\\\\
+	En el caso de \verb|itree_eliminar| el problema surgio cuando el nodo a eliminar tenia dos hijos. Segun nuestro criterio, no queriamos crear un nuevo intervalo con los mismos datos del intervalo que reemplaza al nodo a eliminar. Pero esto traia problemas como, por ejemplo, era muy engorroso tener que actualizar el hijo izquierdo del padre del nodo sucesor, ademas que con esta solucion no verificaba si al eliminar el nodo sucesor el arbol quedaba balanceado o no. Terminamos copiando el intervalo sucesor y llamando recursivamente a \verb|itree_eliminar| sobre el arbol derecho.\\\\
+	En el caso de \verb|itree_intersecar| nos rompimos la cabeza pensando en todos los casos posibles de interseccion entre dos intervalos, pensando en ejemplos y contraejemplos que resulto en una primera implementacion con 7 \verb|if|. Luego pudimos reducir a 3 pero era dificil decir si siempre funcionaba por mas que al testearlo devolviera resultados correctos.\\
+	Leyendo con mayor detenimiento el ejemplo en la consigna del TP logramos escribir el pseudo-codigo implicito en el ejemplo. Sin embargo, seguiamos sin entender por qué siempre funciona. Buscando en internet encontramos una pagina de GeeksforGeeks donde implementaban arboles de intervalos y lo más importante explicaban el algoritmo para la funcion \verb|itree_intersecar|.\\\\
+	En cuanto al interprete, la funcion \verb|strtod| nos salvo la vida.
+	\begin{thebibliography}{4}
+		\bibitem {}
+			Arbol AVL Wikipedia:
+			\url {https://es.wikipedia.org/wiki/%C3%81rbol_AVL}
+		\bibitem {}
+			Deletion in AVL Tree:
+			\url {https://www.youtube.com/watch?v=LXdi_4kSd1o}
+		\bibitem {}
+			\url {https://www.geeksforgeeks.org/interval-tree/}
+		\bibitem {}
+			Funcion strtod()
+			\url {https://www.tutorialspoint.com/c_standard_library/c_function_strtod.htm}
+	\end{thebibliography}
 \end{document}
