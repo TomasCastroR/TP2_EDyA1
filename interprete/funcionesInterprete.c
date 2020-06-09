@@ -61,7 +61,7 @@ Intervalo* validar_intervalo (char* comando) {
   double izquierdo, derecho;
   char bufferIzq[100] = "", bufferDer[100] = "", *basura;
   int indice = 0, i = 3;
-  for (; comando[i] != ','; ++i) {
+  for (; comando[i] != ',' && comando[i] != '\0'; ++i) {
     bufferIzq[indice] = comando[i];
     indice++;
   }
@@ -70,7 +70,7 @@ Intervalo* validar_intervalo (char* comando) {
   if (strcmp (bufferIzq, "") != 0 && strcmp (basura, "") == 0 && comando[i + 1] == ' ') {
     indice = 0;
     i += 2;
-    for (; comando[i] != ']'; ++i) {
+    for (; comando[i] != ']' && comando[i] != '\0'; ++i) {
       bufferDer[indice] = comando[i];
       indice++;
     }
