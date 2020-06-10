@@ -61,7 +61,7 @@
 	En el caso de \verb|itree_eliminar| el problema surgio cuando el nodo a eliminar tenia dos hijos. Segun nuestro criterio, no queriamos crear un nuevo intervalo con los mismos datos del intervalo que reemplaza al nodo a eliminar. Pero esto traia problemas como, por ejemplo, era muy engorroso tener que actualizar el hijo izquierdo del padre del nodo sucesor, ademas que con esta solucion no verificaba si al eliminar el nodo sucesor el arbol quedaba balanceado o no. Terminamos copiando el intervalo sucesor y llamando recursivamente a \verb|itree_eliminar| sobre el arbol derecho.\\\\
 	En el caso de \verb|itree_intersecar| nos rompimos la cabeza pensando en todos los casos posibles de interseccion entre dos intervalos, pensando en ejemplos y contraejemplos que resulto en una primera implementacion con 7 \verb|if|. Luego pudimos reducir a 3 pero era dificil decir si siempre funcionaba por mas que al testearlo devolviera resultados correctos.\\
 	Leyendo con mayor detenimiento el ejemplo en la consigna del TP logramos escribir el pseudo-codigo implicito en el ejemplo. Sin embargo, seguiamos sin entender por qué siempre funciona. Buscando en internet encontramos una pagina de GeeksforGeeks donde implementaban arboles de intervalos y lo más importante explicaban el algoritmo para la funcion \verb|itree_intersecar|.\\\\
-	En cuanto al interprete, la funcion \verb|strtod| nos salvo la vida.
+	En cuanto al interprete, la funcion \verb|strtod| nos facilito mucho el trabajo.
 	\begin{thebibliography}{4}
 		\bibitem {}
 			Arbol AVL Wikipedia:

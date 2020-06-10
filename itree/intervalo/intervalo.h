@@ -5,6 +5,7 @@ typedef struct {
   double extrIzq;
   double extrDer;
 }Intervalo;
+
 /* intervalo_crear: double, double -> *Intervalo
 Recibe dos doubles y devuelve el intervalo creado por ellos*/
 Intervalo* intervalo_crear (double extIzq, double extDer);

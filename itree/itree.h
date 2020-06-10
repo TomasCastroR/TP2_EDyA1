@@ -13,6 +13,7 @@ typedef struct _INodo {
 typedef INodo* ITree;
 
 typedef void (*FuncionVisitante) (ITree dato);
+
 /* itree_crear: -> ITree
 Crea un arbol. */
 ITree itree_crear();
@@ -54,12 +55,12 @@ INodo* itree_intersecar (ITree arbol, Intervalo *intervalo);
 
 /* itree_recorre_dfs: ITree, FuncionVisitante -> 
 Recibe un arbol y una funcion.
- Recorre el arbol utilizando el algoritmo dfs y lo va imprimiendo */
+ Recorre el arbol utilizando el algoritmo dfs y aplica una funcion a cada nodo */
 void itree_recorrer_dfs (ITree arbol, FuncionVisitante funcion);
 
 /* itree_recorre_dfs: ITree, FuncionVisitante -> 
 Recibe un arbol y una funcion.
- Recorre el arbol utilizando el algoritmo bfs y lo va imprimiendo */
+ Recorre el arbol utilizando el algoritmo bfs y aplica una funcion a cada nodo */
 void itree_recorrer_bfs (ITree arbol, FuncionVisitante funcion);
 
 /* itree_altura: ITree -> int
